@@ -5,7 +5,7 @@ class Upsert
   # @private
   class MergeFunction
     MAX_NAME_LENGTH = 62
-    NAME_PREFIX = "upsert#{Upsert::VERSION.gsub('.', '_')}"
+    NAME_PREFIX = ''
 
     class << self
       def execute(controller, row)
@@ -15,7 +15,6 @@ class Upsert
 
       def unique_name(table_name, selector_keys, setter_keys)
         parts = [
-          NAME_PREFIX,
           table_name,
           'SEL',
           selector_keys.join('_A_'),
