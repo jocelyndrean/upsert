@@ -104,13 +104,14 @@ class Upsert
         Upsert.logger.info "[upsert] Creating or replacing database function #{name.inspect} on table #{table_name.inspect} for selector #{selector_keys.map(&:inspect).join(', ')} and setter #{setter_keys.map(&:inspect).join(', ')}"
         first_try = true
         connection.execute(%{
-          CREATE OR REPLACE FUNCTION #{quoted_table_name}(#{(selector_column_definitions.map(&:to_selector_arg) + setter_column_definitions.map(&:to_setter_arg) + hstore_delete_handlers.map(&:to_arg)).join(', ')}) RETURNS VOID AS
+          CREATE OR REPLACE FUNCTION #{table_name.tr('"', '')}(#{(selector_column_definitions.map(&:to_selector_arg) + setter_column_definitions.map(&:to_setter_arg) + hstore_delete_handlers.map(&:to_arg)).join(', ')}) RETURNS VOID AS
           $$
           DECLARE
             first_try INTEGER := 1;
           BEGIN
             LOOP
               -- first try to update the key
+              -- test by jocelyn #{quoted_table_name}
               UPDATE #{quoted_table_name} SET #{update_column_definitions.map(&:to_setter).join(', ')}
                 WHERE #{selector_column_definitions.map(&:to_selector).join(' AND ') };
               IF found THEN
